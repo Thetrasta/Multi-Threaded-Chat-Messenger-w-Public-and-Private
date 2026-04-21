@@ -34,7 +34,8 @@ public class Server {
             }
 
         } catch (IOException e) {
-            //IOExceptions are super common with chat messengers like this. Gotta handle them as they come up
+            //IOExceptions are super common with chat messengers like this. 
+            // Gotta handle them as they come up
 
             System.out.println("ERROR: " + e.getMessage());
         }
@@ -45,8 +46,8 @@ public class Server {
         for (ClientHandler c : clients) {
             c.sendMessage(message);
             /* This is an important section.
-            it sends a message to ALL the clients, 
-            so that everyone can see it*/
+            If something is tagged as a broadcast,
+            everyone in the chat receives the message*/
         }
     }
 
