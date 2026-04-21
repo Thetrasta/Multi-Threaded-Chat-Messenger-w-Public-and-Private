@@ -1,8 +1,13 @@
 import java.io.*;
 import java.net.*;
 
+/* this entire class basically describes what the 
+client will do/how it interacts with the server/gui.
+unlike in the previous server/client assignment the client's
+behavior was being describes in its client class, we have multiple clients now.
+Everytime a new client joins the chat, ClientHandler is invok */
 public class ClientHandler implements Runnable {
-
+/*You need to implement runnable for threads */
     private Socket client;
     private BufferedReader in;
     private PrintWriter out;
@@ -11,17 +16,17 @@ public class ClientHandler implements Runnable {
     public ClientHandler(Socket socket) {
         this.client = socket;
     }
+    /* remember that socket you used in the server? 
+    we're using it here. */
 
     @Override
     public void run() {
+    // standard client behavior, honestly
 
         try {
-            // Set up streams
-            in = new BufferedReader(
-                    new InputStreamReader(client.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             out = new PrintWriter(client.getOutputStream(), true);
 
-            // First message = username
             username = in.readLine();
             System.out.println(username + " joined.");
 
@@ -29,39 +34,28 @@ public class ClientHandler implements Runnable {
 
             String message;
 
-            // Message loop
             while ((message = in.readLine()) != null) {
-
-                // Quit check
                 if (message.equalsIgnoreCase("quit")) {
                     break;
                 }
-
-                // Format message
                 String fullMessage = username + ": " + message;
-
                 System.out.println(fullMessage);
-
-                // Broadcast to all
                 Server.broadcast(fullMessage);
             }
 
         } catch (IOException e) {
             System.out.println("Connection error.");
         } finally {
-            // Cleanup
             Server.removeClient(this);
             Server.broadcast(username + " left the chat.");
 
             try {
                 client.close();
             } catch (IOException e) {
-                // ignore
             }
         }
     }
-
-    // Send message to client
+    
     public void sendMessage(String message) {
         out.println(message);
     }
