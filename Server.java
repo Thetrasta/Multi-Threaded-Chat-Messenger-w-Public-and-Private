@@ -51,9 +51,36 @@ public class Server {
         }
     }
 
+    public static void sendPrivate(String sender, String recipient, String message){
+        boolean exist = false;
+        for (ClientHandler c : clients) {
+            if (c.getUsername().equalsIgnoreCase(recipient)) {
+                c.sendMessage("(Whisper from " + sender + "): " + message);
+                exist = true;
+                break;
+                // this sends a private message to only one user.
+            }
+
+            if (c.getUsername().equalsIgnoreCase(sender)) {
+                c.sendMessage("(Whisper to " + sender + "): " + message);
+                // this sends message to sender as well so they know it went through
+            }
+        }
+        if (!exist) {
+            for (ClientHandler c : clients) {
+                if (c.getUsername().equalsIgnoreCase(sender)) {
+                    c.sendMessage("User not found.");
+                }
+            }
+        }
+
+
+        
+    }
+
     public static void removeClient(ClientHandler client) {
         clients.remove(client);
     }
     /* this portion removes a client if they disconnect
-    ( which might happn) */
+    (which might happen) */
 }
