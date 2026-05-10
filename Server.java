@@ -25,11 +25,7 @@ public class Server {
 
                 ClientHandler handler = new ClientHandler(client);
                 // an object is made to "handle" this client (hence the ClientHandler)
-                clients.add(handler);
-
-                // Start thread (like lecture)
                 Thread t = new Thread(handler);
-                // wraps the handler in a thread (i remember wrappers!!!)
                 t.start();
             }
 
@@ -58,12 +54,12 @@ public class Server {
                 c.sendMessage("(Whisper from " + sender + "): " + message);
                 exist = true;
                 break;
-                // this sends a private message to only one user.
+                // the actual private message 
+                // exist variable is to make sure that the recipient exists in the client list
             }
-
+        
             if (c.getUsername().equalsIgnoreCase(sender)) {
                 c.sendMessage("(Whisper to " + sender + "): " + message);
-                // this sends message to sender as well so they know it went through
             }
         }
         if (!exist) {
@@ -73,10 +69,22 @@ public class Server {
                 }
             }
         }
-
-
-        
+    
     }
+
+    public static boolean usernameExists(String username) {
+        for (ClientHandler c : clients) {
+            if (c.getUsername() != null &&
+            c.getUsername().equalsIgnoreCase(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // this partially handles the problem of identical usernames.
+    // clienthandler handles the rest
+
+
 
     public static void removeClient(ClientHandler client) {
         clients.remove(client);
