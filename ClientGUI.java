@@ -18,6 +18,12 @@ public class ClientGUI {
     public ClientGUI() {
 
         username = JOptionPane.showInputDialog("Enter username:");
+        if (username == null || username.trim().equals("")){
+            JOptionPane.showMessageDialog(null, "Your username can't be empty.");
+            System.exit(0);
+            // if you enter an empty username, the program closes.
+
+        }
         window = new JFrame("Chat - " + username);
 
         chatArea = new JTextArea();
@@ -42,9 +48,24 @@ public class ClientGUI {
 
         connect();
 
+        if (out != null){
+            out.println(username);
+            /* this will prevent a NullPointerException
+            because if the connection fails and the server 
+            tries to find a username that isn't there, 
+            a fatal error could occur*/ 
+        }
+
         out.println(username);
 
         sendButton.addActionListener(e -> {
+
+            if (out == null){
+                chatArea.append("Not connected to server.\n");
+                return;
+            }
+            // message won't send if your connection fails
+            
             String msg = inputField.getText();
             out.println(msg);
             inputField.setText("");
