@@ -28,6 +28,15 @@ public class ClientHandler implements Runnable {
             out = new PrintWriter(client.getOutputStream(), true);
 
             username = in.readLine();
+            if (Server.usernameExists(username)){
+                sendMessage("This username already exists.");
+                client.close();
+                return;
+            }
+            Server.clients.add(this);
+            // only adds username if it's new
+
+            
             System.out.println(username + " joined.");
 
             Server.broadcast(username + " joined the chat.");
@@ -38,10 +47,29 @@ public class ClientHandler implements Runnable {
                 if (message.equalsIgnoreCase("quit")) {
                     break;
                 }
+                
+                if (message.startsWith("/w")){
+
+                    // a whisper must be sent like: /w [username] [message]
+                    String[] parts = message.split(" ", 3);
+
+                    if (parts.length < 3) {
+                        out.println("Invalid whisper format. Use: /w recipient message");
+                        continue;
+                    }
+
+                    String recipient = parts[1];
+                    String msg = parts[2];
+                    Server.sendPrivate(username, recipient, msg);
+                }
+                    else {
+                    
                 String fullMessage = username + ": " + message;
                 System.out.println(fullMessage);
                 Server.broadcast(fullMessage);
             }
+        
+        }
 
         } catch (IOException e) {
             System.out.println("Connection error.");
@@ -58,5 +86,8 @@ public class ClientHandler implements Runnable {
     
     public void sendMessage(String message) {
         out.println(message);
+    }
+    public String getUsername(){
+        return username;
     }
 }
